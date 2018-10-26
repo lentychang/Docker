@@ -1,0 +1,12 @@
+ARG DOCKER_BASE_IMAGE=ros-docker-base
+FROM $DOCKER_BASE_IMAGE
+ARG ROS_DISTRO=kinetic
+
+RUN cd /root && \
+    apt-get -y install ros-kinetic-usb-cam && \
+    git clone https://github.com/ros-drivers/usb_cam.git && \
+    cd /root/catkin_ws && \
+    source devel/setup.bash && \
+    catkin_make
+
+

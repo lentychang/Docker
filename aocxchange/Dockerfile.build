@@ -1,0 +1,44 @@
+#ARG DOCKER_BASE_IMAGE=miniconda:latest
+#FROM $DOCKER_BASE_IMAGE
+#ARG ROS_DISTRO=kinetic
+
+##############################################
+       # Install other package with conda
+##############################################
+# use conda to install package us code below
+
+    # need this in order to use conda
+#RUN export PATH="$HOME/miniconda/bin:$PATH" && \
+    # create env named test
+#    conda create -n aocxchange  && \
+    # install package to an env called "test"
+#    conda install -c gflorent aocxchange -n aocxchange 
+
+# Automatically activate env when enter the container
+#RUN echo "export PATH=/root/miniconda/bin/:$PATH" >> ~/.bashrc && \
+#    echo "source activate aocxchange" >> ~/.bashrc
+
+
+FROM guillaumeflorent/miniconda-pythonocc:3-0.18.3
+
+MAINTAINER Guillaume Florent <florentsailing@gmail.com>
+
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+RUN conda install -y numpy pytest
+RUN conda install -c gflorent corelib aocutils
+
+RUN apt-get update && apt-get install -y libgtk2.0-0 && rm -rf /var/lib/apt/lists/*
+RUN conda install -y -c anaconda wxpython
+
+RUN conda install -y pyqt
+RUN apt-get update && apt-get install -y libgl1-mesa-dev libx11-xcb1 && rm -rf /var/lib/apt/lists/*
+
+# aocxchange
+WORKDIR /opt
+# ADD https://api.github.com/repos/guillaume-florent/aoc-xchange/git/refs/heads/master version.json
+RUN git clone --depth=1 https://github.com/guillaume-florent/aoc-xchange
+WORKDIR /opt/aoc-xchange
+RUN python setup.py install
+
+# setup.py should deal with the installation of command line utilities
